@@ -1,16 +1,14 @@
 import React from 'react';
 import RestaurantNavbar from '../components/RestaurantNavbar';
+import Title from '../components/Title';
 
 export default async function RestaurantDetails({ params }: { params: { slug: string } }) {
   return (
     <>
       <div className="bg-white w-[70%] rounded p-3 shadow">
         <RestaurantNavbar slug={params.slug} />
-        {/* TITLE */}
-        <div className="mt-4 border-b pb-6">
-          <h1 className="font-bold text-6xl">Milesstone Grill</h1>
-        </div>
-        {/* TITLE */} {/* RATING */}
+        <Title name="Milesstone Grill" />
+        {/* RATING */}
         <div className="flex items-end">
           <div className="ratings mt-2 flex items-center">
             <p>*****</p>
