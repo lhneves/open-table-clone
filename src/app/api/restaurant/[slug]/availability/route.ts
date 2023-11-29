@@ -45,7 +45,6 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
       const sumSeats = t.tables.reduce((sum, table) => {
         return sum + table.seats;
       }, 0);
-      console.log(sumSeats, partySize);
       return { time: t.time, available: sumSeats >= parseInt(partySize) };
     })
     .filter((availability) => {
@@ -58,6 +57,5 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
       return timeIsAfterOpeningHours && timeIsBeforeClosingHours;
     });
 
-  console.log(availabilities);
   return NextResponse.json(availabilities);
 }
