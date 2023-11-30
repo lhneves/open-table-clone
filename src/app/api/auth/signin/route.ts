@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import validator from "validator";
-import bcrypt from "bcrypt";
-import * as jose from "jose";
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-
-const prisma = new PrismaClient();
+import validator from 'validator';
+import bcrypt from 'bcrypt';
+import * as jose from 'jose';
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import prisma from '../../../../../prisma/db';
 
 export async function POST(req: NextRequest, res: NextResponse<any>) {
   const { email, password } = await req.json();
@@ -14,13 +12,13 @@ export async function POST(req: NextRequest, res: NextResponse<any>) {
   const validationSchema = [
     {
       valid: validator.isEmail(email),
-      errorMessage: "Email is invalid",
+      errorMessage: 'Email is invalid',
     },
     {
       valid: validator.isLength(password, {
         min: 1,
       }),
-      errorMessage: "Password is invalid",
+      errorMessage: 'Password is invalid',
     },
   ];
 
@@ -31,10 +29,7 @@ export async function POST(req: NextRequest, res: NextResponse<any>) {
   });
 
   if (errors.length > 0) {
-    return NextResponse.json(
-      { errorMessage: errors[0], error: errors[0] },
-      { status: 400 }
-    );
+    return NextResponse.json({ errorMessage: errors[0], error: errors[0] }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({
@@ -46,10 +41,10 @@ export async function POST(req: NextRequest, res: NextResponse<any>) {
   if (!user) {
     return NextResponse.json(
       {
-        errorMessage: "Email or password is invalid",
-        error: "Email or password is invalid",
+        errorMessage: 'Email or password is invalid',
+        error: 'Email or password is invalid',
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -57,21 +52,21 @@ export async function POST(req: NextRequest, res: NextResponse<any>) {
 
   if (!isMatch) {
     return NextResponse.json({
-      errorMessage: "Email or password is invalid",
-      error: "Email or password is invalid",
+      errorMessage: 'Email or password is invalid',
+      error: 'Email or password is invalid',
     });
   }
 
-  const alg = "HS256";
+  const alg = 'HS256';
 
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
   const token = await new jose.SignJWT({ email: user.email })
     .setProtectedHeader({ alg })
-    .setExpirationTime("24h")
+    .setExpirationTime('24h')
     .sign(secret);
 
-  cookies().set("jwt", token, { maxAge: 60 * 6 * 24 });
+  cookies().set('jwt', token, { maxAge: 60 * 6 * 24 });
 
   return NextResponse.json(
     {
@@ -81,6 +76,6 @@ export async function POST(req: NextRequest, res: NextResponse<any>) {
       phone: user.phone,
       city: user.city,
     },
-    { status: 200 }
+    { status: 200 },
   );
 }

@@ -24,7 +24,9 @@
     "react": "latest",
     "react-datepicker": "^4.23.0",
     "react-dom": "latest",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "zod": "^3.22.4",
+    "zod-form-data": "^2.0.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.2.0",

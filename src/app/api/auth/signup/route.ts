@@ -1,15 +1,12 @@
-import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
-import validator from "validator";
-import bcrypt from "bcrypt";
-import * as jose from "jose";
-import { cookies } from "next/headers";
-
-const prisma = new PrismaClient();
+import { NextRequest, NextResponse } from 'next/server';
+import validator from 'validator';
+import bcrypt from 'bcrypt';
+import * as jose from 'jose';
+import { cookies } from 'next/headers';
+import prisma from '../../../../../prisma/db';
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const { firstName, lastName, email, phone, city, password } =
-    await req.json();
+  const { firstName, lastName, email, phone, city, password } = await req.json();
   const errors: string[] = [];
 
   const validationSchema = [
@@ -18,30 +15,30 @@ export async function POST(req: NextRequest, res: NextResponse) {
         min: 1,
         max: 20,
       }),
-      errorMessage: "First name is invalid",
+      errorMessage: 'First name is invalid',
     },
     {
       valid: validator.isLength(lastName, {
         min: 1,
         max: 20,
       }),
-      errorMessage: "First name is invalid",
+      errorMessage: 'First name is invalid',
     },
     {
       valid: validator.isEmail(email),
-      errorMessage: "Email is invalid",
+      errorMessage: 'Email is invalid',
     },
     {
       valid: validator.isMobilePhone(phone),
-      errorMessage: "Phone number is invalid",
+      errorMessage: 'Phone number is invalid',
     },
     {
       valid: validator.isLength(city, { min: 1 }),
-      errorMessage: "City is invalid",
+      errorMessage: 'City is invalid',
     },
     {
       valid: validator.isStrongPassword(password),
-      errorMessage: "Password is not strong enough",
+      errorMessage: 'Password is not strong enough',
     },
   ];
 
@@ -52,10 +49,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   });
 
   if (errors.length) {
-    return NextResponse.json(
-      { errorMessage: errors[0], error: errors[0] },
-      { status: 400 }
-    );
+    return NextResponse.json({ errorMessage: errors[0], error: errors[0] }, { status: 400 });
   }
 
   const userWithEmail = await prisma.user.findUnique({
@@ -67,10 +61,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
   if (userWithEmail) {
     return NextResponse.json(
       {
-        errorMessage: "Email is associated with another account",
-        error: "Email is associated with another account",
+        errorMessage: 'Email is associated with another account',
+        error: 'Email is associated with another account',
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -87,16 +81,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
     },
   });
 
-  const alg = "HS256";
+  const alg = 'HS256';
 
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
   const token = await new jose.SignJWT({ email: user.email })
     .setProtectedHeader({ alg })
-    .setExpirationTime("24h")
+    .setExpirationTime('24h')
     .sign(secret);
 
-  cookies().set("jwt", token, { maxAge: 60 * 6 * 24 });
+  cookies().set('jwt', token, { maxAge: 60 * 6 * 24 });
 
   return NextResponse.json(
     {
@@ -106,6 +100,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       phone: user.phone,
       city: user.city,
     },
-    { status: 200 }
+    { status: 200 },
   );
 }
