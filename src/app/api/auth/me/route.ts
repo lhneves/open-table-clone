@@ -1,24 +1,22 @@
-import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
-
-const prisma = new PrismaClient();
+import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import prisma from '../../../../../prisma/db';
 
 export async function GET() {
   const headersList = headers();
-  const bearerToken = headersList.get("authorization") as string;
+  const bearerToken = headersList.get('authorization') as string;
 
-  const token = bearerToken.split(" ")[1];
+  const token = bearerToken.split(' ')[1];
 
   const payload = jwt.decode(token) as { email: string };
 
   if (!payload.email) {
     return NextResponse.json(
       {
-        errorMessage: "Unauthorized request",
+        errorMessage: 'Unauthorized request',
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -39,9 +37,9 @@ export async function GET() {
   if (!user) {
     return NextResponse.json(
       {
-        errorMessage: "User not found",
+        errorMessage: 'User not found',
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 

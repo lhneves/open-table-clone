@@ -1,8 +1,6 @@
 import { findAvailableTables } from '@/services/restaurant/findAvailableTables';
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../../../prisma/db';
 
 export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
   const slug = params.slug;
